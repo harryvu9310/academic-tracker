@@ -35,6 +35,7 @@ $DistDir = Join-Path $RootDir "dist\windows"
 $IconPath = Join-Path $RootDir "packaging\icons\app.ico"
 $ExePath = Join-Path $DistDir "$OutputArtifactPrefix-$AppVersion-windows-x64.exe"
 $MsiPath = Join-Path $DistDir "$OutputArtifactPrefix-$AppVersion-windows-x64.msi"
+$ZipPath = Join-Path $DistDir "$OutputArtifactPrefix-$AppVersion-windows-x64.zip"
 
 function Require-Command($Name, $Message) {
     if (-not (Get-Command $Name -ErrorAction SilentlyContinue)) {
@@ -46,12 +47,24 @@ Require-Command "java" "Java 21 is required but java was not found on PATH."
 Require-Command "javac" "A full Java 21 JDK is required, but javac was not found on PATH."
 Require-Command "jpackage" "jpackage was not found. Install a full Java 21 JDK and ensure jpackage is on PATH."
 
-$JavaVersionLine = (& java -version 2>&1 | Select-Object -First 1).ToString()
-if ($JavaVersionLine -notmatch '"(?<major>\d+)') {
-    throw "Could not determine Java version from: $JavaVersionLine"
+$JavaVersionOutput = & java -version 2>&1
+if ($LASTEXITCODE -ne 0) {
+    throw "java -version failed: $JavaVersionOutput"
 }
-if ([int]$Matches["major"] -lt 21) {
-    throw "Java 21 or newer is required. Current version: $JavaVersionLine"
+$JavaVersionLine = ($JavaVersionOutput | Select-Object -First 1).ToString()
+
+if ($JavaVersionLine -notmatch '"21\.') {
+    throw "Java 21 is required. Found: $JavaVersionLine"
+}
+
+$JavacVersionOutput = & javac -version 2>&1
+if ($LASTEXITCODE -ne 0) {
+    throw "javac -version failed: $JavacVersionOutput"
+}
+
+$JpackageVersionOutput = & jpackage --version 2>&1
+if ($LASTEXITCODE -ne 0) {
+    throw "jpackage --version failed: $JpackageVersionOutput"
 }
 
 if (-not (Test-Path ".\mvnw.cmd")) {
@@ -111,6 +124,17 @@ if ($CreatedExe.FullName -ne $ExePath) {
     Move-Item -Force $CreatedExe.FullName $ExePath
 }
 
+Write-Host "Creating portable ZIP..."
+& jpackage --type app-image @CommonArgs --dest $DistDir
+
+$AppImageDir = Get-ChildItem $DistDir -Directory | Where-Object { $_.Name -match [regex]::Escape($AppName) } | Select-Object -First 1
+if ($AppImageDir) {
+    Compress-Archive -Path $AppImageDir.FullName -DestinationPath $ZipPath -Force
+    Write-Host "ZIP: $ZipPath"
+} else {
+    Write-Warning "App image directory not found for ZIP creation."
+}
+
 if ($env:CREATE_MSI -eq "1") {
     Write-Host "CREATE_MSI=1 set. Attempting MSI installer..."
     try {
@@ -133,4 +157,7 @@ Write-Host "Windows packaging complete."
 Write-Host "EXE: $ExePath"
 if (Test-Path $MsiPath) {
     Write-Host "MSI: $MsiPath"
+}
+if (Test-Path $ZipPath) {
+    Write-Host "ZIP: $ZipPath"
 }
