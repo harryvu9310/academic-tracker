@@ -99,11 +99,7 @@ $CommonArgs = @(
     "--input", $InputDir,
     "--main-jar", $MainJar.Name,
     "--main-class", $MainClass,
-    "--java-options", "-Dfile.encoding=UTF-8",
-    "--win-menu",
-    "--win-shortcut",
-    "--win-dir-chooser",
-    "--win-upgrade-uuid", "8f3682d0-71aa-4c80-8c10-4a1ad0f8b901"
+    "--java-options", "-Dfile.encoding=UTF-8"
 )
 
 if (Test-Path $IconPath) {
@@ -113,6 +109,13 @@ if (Test-Path $IconPath) {
     Write-Host "No Windows icon found at packaging\icons\app.ico; packaging without a custom icon."
 }
 
+$InstallerArgs = @($CommonArgs) + @(
+    "--win-menu",
+    "--win-shortcut",
+    "--win-dir-chooser",
+    "--win-upgrade-uuid", "8f3682d0-71aa-4c80-8c10-4a1ad0f8b901"
+)
+
 Write-Host "Creating portable app-image and ZIP artifact..."
 try {
     & jpackage --type app-image @CommonArgs --dest $DistDir
@@ -120,17 +123,21 @@ try {
     throw "jpackage app-image failed: $($_.Exception.Message)"
 }
 
-$AppImageDir = Get-ChildItem $DistDir -Directory | Where-Object { $_.Name -eq $AppName } | Select-Object -First 1
+$AppImageDir = Get-ChildItem $DistDir -Directory | Where-Object { $_.Name -like "$AppName*" } | Select-Object -First 1
 if (-not $AppImageDir) {
     throw "App image directory not found in $DistDir after jpackage app-image."
 }
 
 Compress-Archive -Path $AppImageDir.FullName -DestinationPath $ZipPath -Force
+$ZipInfo = Get-Item $ZipPath
+if (-not $ZipInfo -or $ZipInfo.Length -eq 0) {
+    throw "Created ZIP artifact is missing or empty: $ZipPath"
+}
 Write-Host "Created portable ZIP: $ZipPath"
 
 Write-Host "Attempting Windows EXE installer..."
 try {
-    & jpackage --type exe @CommonArgs --dest $DistDir
+    & jpackage --type exe @InstallerArgs --dest $DistDir
     $CreatedExe = Get-ChildItem $DistDir -Filter "*.exe" | Sort-Object Name | Select-Object -First 1
     if ($CreatedExe -and $CreatedExe.Length -gt 0) {
         if ($CreatedExe.FullName -ne $ExePath) {
@@ -147,7 +154,7 @@ try {
 if ($env:CREATE_MSI -eq "1") {
     Write-Host "CREATE_MSI=1 set. Attempting MSI installer..."
     try {
-        & jpackage --type msi @CommonArgs --dest $DistDir
+        & jpackage --type msi @InstallerArgs --dest $DistDir
         $CreatedMsi = Get-ChildItem $DistDir -Filter "*.msi" | Sort-Object Name | Select-Object -First 1
         if ($CreatedMsi -and $CreatedMsi.Length -gt 0) {
             if ($CreatedMsi.FullName -ne $MsiPath) {
