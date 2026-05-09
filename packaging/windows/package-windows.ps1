@@ -113,26 +113,35 @@ if (Test-Path $IconPath) {
     Write-Host "No Windows icon found at packaging\icons\app.ico; packaging without a custom icon."
 }
 
-Write-Host "Creating Windows EXE installer..."
-& jpackage --type exe @CommonArgs --dest $DistDir
-
-$CreatedExe = Get-ChildItem $DistDir -Filter "*.exe" | Sort-Object Name | Select-Object -First 1
-if (-not $CreatedExe -or $CreatedExe.Length -eq 0) {
-    throw "jpackage did not create a non-empty EXE in $DistDir. WiX Toolset may be missing or misconfigured."
-}
-if ($CreatedExe.FullName -ne $ExePath) {
-    Move-Item -Force $CreatedExe.FullName $ExePath
+Write-Host "Creating portable app-image and ZIP artifact..."
+try {
+    & jpackage --type app-image @CommonArgs --dest $DistDir
+} catch {
+    throw "jpackage app-image failed: $($_.Exception.Message)"
 }
 
-Write-Host "Creating portable ZIP..."
-& jpackage --type app-image @CommonArgs --dest $DistDir
+$AppImageDir = Get-ChildItem $DistDir -Directory | Where-Object { $_.Name -eq $AppName } | Select-Object -First 1
+if (-not $AppImageDir) {
+    throw "App image directory not found in $DistDir after jpackage app-image."
+}
 
-$AppImageDir = Get-ChildItem $DistDir -Directory | Where-Object { $_.Name -match [regex]::Escape($AppName) } | Select-Object -First 1
-if ($AppImageDir) {
-    Compress-Archive -Path $AppImageDir.FullName -DestinationPath $ZipPath -Force
-    Write-Host "ZIP: $ZipPath"
-} else {
-    Write-Warning "App image directory not found for ZIP creation."
+Compress-Archive -Path $AppImageDir.FullName -DestinationPath $ZipPath -Force
+Write-Host "Created portable ZIP: $ZipPath"
+
+Write-Host "Attempting Windows EXE installer..."
+try {
+    & jpackage --type exe @CommonArgs --dest $DistDir
+    $CreatedExe = Get-ChildItem $DistDir -Filter "*.exe" | Sort-Object Name | Select-Object -First 1
+    if ($CreatedExe -and $CreatedExe.Length -gt 0) {
+        if ($CreatedExe.FullName -ne $ExePath) {
+            Move-Item -Force $CreatedExe.FullName $ExePath
+        }
+        Write-Host "EXE: $ExePath"
+    } else {
+        Write-Warning "jpackage exe packaging completed but no EXE artifact was found."
+    }
+} catch {
+    Write-Warning "Windows EXE packaging failed; continuing because ZIP is available. Reason: $($_.Exception.Message)"
 }
 
 if ($env:CREATE_MSI -eq "1") {
@@ -144,11 +153,12 @@ if ($env:CREATE_MSI -eq "1") {
             if ($CreatedMsi.FullName -ne $MsiPath) {
                 Move-Item -Force $CreatedMsi.FullName $MsiPath
             }
+            Write-Host "MSI: $MsiPath"
         } else {
             Write-Warning "MSI packaging completed without a non-empty MSI artifact."
         }
     } catch {
-        Write-Warning "MSI packaging failed. EXE is still available. Reason: $($_.Exception.Message)"
+        Write-Warning "MSI packaging failed; the ZIP artifact is still available. Reason: $($_.Exception.Message)"
     }
 }
 

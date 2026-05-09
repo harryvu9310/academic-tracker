@@ -56,11 +56,29 @@ jobs:
         if: runner.os != 'Windows'
         run: chmod +x mvnw run.sh test.sh scripts/*.sh packaging/**/*.sh
 
-      - name: Package
+      - name: Package on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: .\packaging\windows\package-windows.ps1
+
+      - name: Package on macOS/Linux
+        if: runner.os != 'Windows'
         shell: bash
         run: ${{ matrix.package-command }}
 
-      - name: Upload dist artifacts
+      - name: Upload dist artifacts for Windows
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact-name }}
+          path: |
+            dist/windows/*.zip
+            dist/windows/*.exe
+            dist/windows/*.msi
+          if-no-files-found: error
+
+      - name: Upload dist artifacts for macOS/Linux
+        if: runner.os != 'Windows'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact-name }}
