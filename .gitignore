@@ -1,0 +1,49 @@
+# Build output
+target/
+**/target/
+out/
+build/
+dist/
+releases/artifacts/
+*.class
+*.dmg
+*.exe
+*.msi
+*.deb
+*.rpm
+*.zip
+
+# Local app data and temporary files
+student_data.json
+*.log
+package-log.txt
+*.tmp
+*.bak
+
+# OS/archive junk
+.DS_Store
+**/.DS_Store
+__MACOSX/
+**/__MACOSX/
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# VS Code
+# Keep intentional project JSON files but ignore transient editor files.
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/settings.json
+!.vscode/tasks.json
+
+# Maven wrapper
+!.mvn/wrapper/maven-wrapper.jar

@@ -1,0 +1,21 @@
+.root,
+.app-root {
+    -app-background: #111113;
+    -app-surface: #1C1C1E;
+    -app-surface-elevated: #2C2C2E;
+    -app-text: #F5F5F7;
+    -app-text-secondary: #A1A1A6;
+    -app-text-muted: #8E8E93;
+    -app-border: rgba(255, 255, 255, 0.12);
+    -app-border-strong: rgba(255, 255, 255, 0.20);
+    -app-accent: #0A84FF;
+    -app-accent-soft: rgba(10, 132, 255, 0.18);
+    -app-success: #30D158;
+    -app-success-soft: rgba(48, 209, 88, 0.18);
+    -app-warning: #FF9F0A;
+    -app-warning-soft: rgba(255, 159, 10, 0.18);
+    -app-danger: #FF453A;
+    -app-danger-soft: rgba(255, 69, 58, 0.18);
+    -app-neutral-soft: rgba(142, 142, 147, 0.18);
+    -app-shadow: rgba(0, 0, 0, 0.45);
+}

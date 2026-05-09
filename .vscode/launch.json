@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Debug Academic Tracker App",
+      "request": "launch",
+      "mainClass": "com.tracker.academictracker.Launcher",
+      "projectName": "academic-tracker-app",
+      "cwd": "${workspaceFolder}",
+      "shortenCommandLine": "argfile"
+    }
+  ]
+}

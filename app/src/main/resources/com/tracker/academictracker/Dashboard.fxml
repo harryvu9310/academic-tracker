@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane styleClass="app-root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tracker.academictracker.controller.DashboardController">
+    <left>
+        <VBox prefWidth="260.0" styleClass="sidebar">
+            <Label styleClass="sidebar-header" text="Academic Tracker" />
+            <Label styleClass="sidebar-caption" text="Academic Command Center" wrapText="true" />
+
+            <VBox spacing="8">
+                <Button fx:id="btnDashboard" mnemonicParsing="false" onAction="#handleNavigation" styleClass="sidebar-button" text="Overview" />
+                <Button fx:id="btnSemesters" mnemonicParsing="false" onAction="#handleNavigation" styleClass="sidebar-button" text="Semesters" />
+                <Button fx:id="btnCourseRoster" mnemonicParsing="false" onAction="#handleNavigation" styleClass="sidebar-button" text="Courses" />
+                <Button fx:id="btnSettings" mnemonicParsing="false" onAction="#handleNavigation" styleClass="sidebar-button" text="Settings" />
+            </VBox>
+
+            <Region VBox.vgrow="ALWAYS" />
+            <VBox spacing="6">
+                <Label styleClass="section-caption" text="Local-first desktop tracker" />
+                <Label styleClass="muted-text" text="GPA, credits, and prediction stay on your device." wrapText="true" />
+            </VBox>
+        </VBox>
+    </left>
+
+    <center>
+        <BorderPane fx:id="mainContentPane" styleClass="main-shell">
+            <top>
+                <HBox alignment="CENTER_LEFT" spacing="18" styleClass="top-bar">
+                    <VBox spacing="5">
+                        <HBox alignment="CENTER_LEFT" spacing="12">
+                            <Label fx:id="studentNameLabel" styleClass="page-title" text="Student Name" />
+                            <Label fx:id="academicStandingLabel" styleClass="badge" text="New Student" />
+                        </HBox>
+                        <Label fx:id="studentIdLabel" styleClass="page-subtitle" text="ID: N/A" />
+                    </VBox>
+
+                    <Region HBox.hgrow="ALWAYS" />
+
+                    <VBox spacing="5">
+                        <Label styleClass="form-label" text="Active Semester" />
+                        <ComboBox fx:id="activeSemesterComboBox" styleClass="modern-combo-box" />
+                    </VBox>
+                </HBox>
+            </top>
+
+            <center>
+                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" pannable="true" styleClass="page-scroll" vbarPolicy="AS_NEEDED">
+                    <content>
+                        <VBox fx:id="dashboardContent" styleClass="content-container">
+                            <VBox spacing="5">
+                                <Label styleClass="page-title" text="Academic Overview" />
+                                <Label styleClass="page-subtitle" text="Official GPA, scenario estimates, credit progress, and next actions at a glance." wrapText="true" />
+                            </VBox>
+
+                            <FlowPane hgap="18" styleClass="responsive-flow" vgap="18">
+                                <VBox minWidth="220" prefWidth="240" styleClass="metric-card">
+                                    <Label styleClass="metric-label" text="Official GPA" />
+                                    <Label fx:id="overallGpaLabel" styleClass="metric-value" text="N/A" />
+                                    <Label styleClass="section-caption" text="Completed valid courses only" wrapText="true" />
+                                </VBox>
+                                <VBox minWidth="220" prefWidth="240" styleClass="metric-card">
+                                    <Label styleClass="metric-label" text="Current Projected GPA" />
+                                    <Label fx:id="projectedGpaLabel" styleClass="metric-value" text="N/A" />
+                                    <Label styleClass="section-caption" text="Scenario estimate from active courses" wrapText="true" />
+                                </VBox>
+                                <VBox minWidth="220" prefWidth="240" styleClass="metric-card">
+                                    <Label styleClass="metric-label" text="Completed Credits" />
+                                    <Label fx:id="creditsProgressLabel" styleClass="metric-value" text="0" />
+                                    <Label styleClass="section-caption" text="Progress uses configured program credits when available" wrapText="true" />
+                                </VBox>
+                                <VBox minWidth="220" prefWidth="240" styleClass="metric-card">
+                                    <Label styleClass="metric-label" text="Term GPA" />
+                                    <Label fx:id="termGpaLabel" styleClass="metric-value" text="N/A" />
+                                    <Label fx:id="targetGapLabel" styleClass="section-caption" text="No target selected" wrapText="true" />
+                                </VBox>
+                            </FlowPane>
+
+                            <VBox styleClass="prediction-card">
+                                <HBox alignment="CENTER_LEFT" spacing="12">
+                                    <VBox spacing="5">
+                                        <Label styleClass="section-title" text="Prediction Insight" />
+                                        <Label styleClass="section-caption" text="Targets are scenario estimates, not certainty." />
+                                    </VBox>
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <Label fx:id="predictionRiskBadge" styleClass="badge" text="No target" />
+                                    <Label fx:id="predictionConfidenceBadge" styleClass="badge" text="Confidence unknown" />
+                                </HBox>
+
+                                <FlowPane hgap="12" styleClass="responsive-flow" vgap="12">
+                                    <VBox minWidth="220" prefWidth="320" spacing="5">
+                                        <Label styleClass="form-label" text="Cumulative GPA target" />
+                                        <TextField fx:id="targetGpaInput" onAction="#calculateTargetGrades" promptText="e.g., 3.60" />
+                                    </VBox>
+                                    <VBox minWidth="220" prefWidth="320" spacing="5">
+                                        <Label styleClass="form-label" text="Major GPA target" />
+                                        <TextField fx:id="targetMajorGpaInput" onAction="#calculateTargetGrades" promptText="optional" />
+                                    </VBox>
+                                    <Button onAction="#calculateTargetGrades" styleClass="primary-button" text="Analyze Target" />
+                                </FlowPane>
+
+                                <VBox fx:id="predictionInsightContainer" spacing="10">
+                                    <Label fx:id="predictionResultLabel" styleClass="body-text" text="Enter a target GPA to see mathematical feasibility, realistic risk, and priority actions." wrapText="true" />
+                                </VBox>
+                            </VBox>
+
+                            <FlowPane hgap="18" styleClass="responsive-flow" vgap="18">
+                                <VBox minWidth="320" prefWidth="460" styleClass="priority-card">
+                                    <Label styleClass="section-title" text="Priority Courses" />
+                                    <Label styleClass="section-caption" text="Highest-impact courses based on current status and prediction risk." />
+                                    <VBox fx:id="priorityCoursesContainer" spacing="10" />
+                                </VBox>
+
+                                <VBox minWidth="320" prefWidth="460" styleClass="card">
+                                    <Label styleClass="section-title" text="Active Courses" />
+                                    <Label styleClass="section-caption" text="Current semester courses and entered assessment pace." />
+                                    <VBox fx:id="activeCoursesContainer" spacing="10" />
+                                </VBox>
+                            </FlowPane>
+                        </VBox>
+                    </content>
+                </ScrollPane>
+            </center>
+        </BorderPane>
+    </center>
+</BorderPane>

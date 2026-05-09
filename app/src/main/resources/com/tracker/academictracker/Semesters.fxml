@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" pannable="true" styleClass="page-scroll" vbarPolicy="AS_NEEDED" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tracker.academictracker.controller.SemestersController">
+<content>
+<VBox spacing="22" styleClass="content-container">
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <VBox spacing="5">
+            <Label styleClass="page-title" text="Semesters" />
+            <Label styleClass="page-subtitle" text="Organize courses by term and choose the active semester for the dashboard." wrapText="true" />
+        </VBox>
+        <Region HBox.hgrow="ALWAYS" />
+        <Button onAction="#handleAddSemester" styleClass="primary-button" text="+ Add Semester" />
+    </HBox>
+
+    <VBox fx:id="addSemesterForm" managed="false" visible="false" spacing="15" styleClass="settings-card">
+        <Label text="Add New Semester" styleClass="section-title" />
+        <FlowPane hgap="16" styleClass="responsive-flow" vgap="16">
+            <VBox minWidth="180" prefWidth="240" spacing="6">
+                <Label text="Year" styleClass="form-label" />
+                <TextField fx:id="yearInput" promptText="2026" />
+            </VBox>
+            <VBox minWidth="180" prefWidth="240" spacing="6">
+                <Label text="Term" styleClass="form-label" />
+                <ComboBox fx:id="termInput" maxWidth="Infinity" styleClass="modern-combo-box" />
+            </VBox>
+        </FlowPane>
+        <HBox spacing="10">
+            <Button onAction="#saveNewSemester" text="Add Semester" styleClass="primary-button" />
+            <Button onAction="#hideAddForm" text="Cancel" styleClass="secondary-button" />
+        </HBox>
+    </VBox>
+
+    <VBox fx:id="semesterListContainer" spacing="14" />
+</VBox>
+</content>
+</ScrollPane>

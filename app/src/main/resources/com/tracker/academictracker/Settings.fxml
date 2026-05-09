@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" pannable="true" styleClass="page-scroll" vbarPolicy="AS_NEEDED" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tracker.academictracker.controller.SettingsController">
+<content>
+<VBox spacing="22" styleClass="content-container">
+    <VBox spacing="5">
+        <Label styleClass="page-title" text="Settings" />
+        <Label styleClass="page-subtitle" text="Academic program, appearance, data, and local app preferences." wrapText="true" />
+    </VBox>
+
+    <VBox spacing="14" styleClass="settings-card">
+        <Label styleClass="section-title" text="Academic Program" />
+        <Label wrapText="true" styleClass="body-text" text="These values are used by the GPA prediction engine. Leave blank if unknown; prediction will be based only on known courses." />
+        <FlowPane hgap="16" styleClass="responsive-flow" vgap="16">
+            <VBox minWidth="220" prefWidth="320" spacing="6">
+                <Label styleClass="form-label" text="Degree Total Credits" />
+                <TextField fx:id="degreeTotalCreditsInput" promptText="e.g., 132" />
+            </VBox>
+            <VBox minWidth="220" prefWidth="320" spacing="6">
+                <Label styleClass="form-label" text="Major Required Credits" />
+                <TextField fx:id="majorRequiredCreditsInput" promptText="e.g., 72" />
+            </VBox>
+            <VBox alignment="BOTTOM_LEFT">
+                <Button onAction="#handleSaveProgramConfig" styleClass="primary-button" text="Save Program" />
+            </VBox>
+        </FlowPane>
+    </VBox>
+
+    <VBox spacing="14" styleClass="settings-card">
+        <Label styleClass="section-title" text="Appearance" />
+        <Label wrapText="true" styleClass="body-text" text="Choose a calm light or dark theme. The selection is saved with your local profile." />
+        <FlowPane hgap="16" styleClass="responsive-flow" vgap="16">
+            <VBox minWidth="220" prefWidth="320" spacing="6">
+                <Label styleClass="form-label" text="Theme" />
+                <ComboBox fx:id="themeInput" maxWidth="Infinity" styleClass="modern-combo-box" />
+            </VBox>
+            <VBox alignment="BOTTOM_LEFT">
+                <Button onAction="#handleSaveTheme" styleClass="secondary-button" text="Apply Theme" />
+            </VBox>
+        </FlowPane>
+    </VBox>
+
+    <VBox spacing="14" styleClass="settings-card">
+        <Label styleClass="section-title" text="Data" />
+        <Label wrapText="true" styleClass="body-text" text="Data is stored locally. Imports are validated before the current save file is replaced." />
+        <FlowPane hgap="14" styleClass="responsive-flow" vgap="14">
+            <Button minWidth="150" onAction="#handleSaveData" styleClass="primary-button" text="Save Data" />
+            <Button minWidth="150" onAction="#handleLoadData" styleClass="secondary-button" text="Load Data" />
+            <Button minWidth="150" onAction="#handleExportData" styleClass="success-button" text="Export JSON" />
+            <Button minWidth="150" onAction="#handleImportData" styleClass="secondary-button" text="Import JSON" />
+        </FlowPane>
+    </VBox>
+
+    <VBox spacing="10" styleClass="settings-card">
+        <HBox alignment="CENTER_LEFT">
+            <VBox spacing="5">
+                <Label styleClass="section-title" text="About" />
+                <Label wrapText="true" styleClass="body-text" text="Academic Tracker helps you manage courses, track grades, and reason about GPA targets with deterministic scenario estimates." />
+            </VBox>
+            <Region HBox.hgrow="ALWAYS" />
+            <Label styleClass="badge" text="Java 21 + JavaFX" />
+        </HBox>
+    </VBox>
+</VBox>
+</content>
+</ScrollPane>
